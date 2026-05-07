@@ -614,7 +614,7 @@
   document.getElementById('startBtn').addEventListener('click', () => {
     intro.classList.add('hidden');
     musicBar.classList.add('visible');
- 
+
     // Try to play audio if user provided a file
     const audio = document.getElementById('bgMusic');
     audio.volume = 1;
@@ -625,11 +625,17 @@
         console.log('Audio play error:', error);
       });
     }
+  });
+
+  // ── Scroll observer ──
+  let scrolled = false;
+  window.addEventListener('scroll', () => {
+    if (!scrolled && window.scrollY > 80) {
       scrolled = true;
       scrollHint.classList.add('hidden');
     }
   });
- 
+
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(e => {
       if (e.isIntersecting) {

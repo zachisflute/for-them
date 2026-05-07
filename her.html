@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For Chastine</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&family=Lora:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+  :root {
+    --amber: #c8813a;
+    --amber-light: #e8a45a;
+    --cream: #fdf6ec;
+    --cream-dark: #f5e8d0;
+    --rust: #8b3a1e;
+    --rust-light: #c4522a;
+    --warm-dark: #2c1a0e;
+    --warm-mid: #6b3d1e;
+    --gold: #d4a43a;
+    --glow: #ffcc66;
+  }
+ 
+  html { scroll-behavior: smooth; }
+ 
+  body {
+    background: var(--warm-dark);
+    font-family: 'Lora', serif;
+    color: var(--cream);
+    overflow-x: hidden;
+    cursor: default;
+  }
+ 
+  /* Grain overlay */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 999;
+  }
+ 
+  /* ── INTRO SCREEN ── */
+  #intro {
+    position: fixed;
+    inset: 0;
+    background: var(--warm-dark);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    transition: opacity 1s ease, visibility 1s ease;
+  }
+ 
+  #intro.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+ 
+  .intro-label {
+    font-family: 'Lora', serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 20px;
+    opacity: 0;
+    animation: fadeUp 1s ease 0.5s forwards;
+  }
+ 
+  .intro-name {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3rem, 14vw, 6rem);
+    font-style: italic;
+    color: var(--cream);
+    line-height: 1;
+    opacity: 0;
+    animation: fadeUp 1s ease 0.9s forwards;
+  }
+ 
+  .intro-name span { color: var(--amber-light); }
+ 
+  .intro-sub {
+    font-size: 0.8rem;
+    font-weight: 300;
+    color: #a07050;
+    margin-top: 14px;
+    letter-spacing: 0.1em;
+    opacity: 0;
+    animation: fadeUp 1s ease 1.3s forwards;
+  }
+ 
+  .start-btn {
+    margin-top: 52px;
+    padding: 14px 44px;
+    background: transparent;
+    border: 1px solid var(--amber);
+    color: var(--amber-light);
+    font-family: 'Lora', serif;
+    font-size: 0.8rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    cursor: pointer;
+    opacity: 0;
+    animation: fadeUp 1s ease 1.8s forwards;
+    transition: all 0.3s ease;
+  }
+ 
+  .start-btn:hover {
+    background: var(--amber);
+    color: var(--warm-dark);
+  }
+ 
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+ 
+  /* ── STORY SECTIONS ── */
+  .story {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 0 32px;
+  }
+ 
+  .section {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 100px 0;
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.9s ease, transform 0.9s ease;
+  }
+ 
+  .section.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+ 
+  /* Chapter label */
+  .chapter {
+    font-size: 0.65rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+ 
+  .chapter::after {
+    content: '';
+    flex: 1;
+    max-width: 60px;
+    height: 1px;
+    background: var(--amber);
+    opacity: 0.4;
+  }
+ 
+  /* Big display text */
+  .display {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 7vw, 3.4rem);
+    font-weight: 400;
+    line-height: 1.25;
+    color: var(--cream);
+    margin-bottom: 28px;
+  }
+ 
+  .display em {
+    font-style: italic;
+    color: var(--amber-light);
+  }
+ 
+  /* Body paragraph */
+  .para {
+    font-size: 1.05rem;
+    line-height: 1.95;
+    color: #c8a882;
+    font-weight: 300;
+    margin-bottom: 20px;
+  }
+ 
+  .para em {
+    font-style: italic;
+    color: var(--cream-dark);
+  }
+ 
+  /* Pull quote */
+  .pull {
+    border-left: 2px solid var(--amber);
+    padding: 16px 24px;
+    margin: 32px 0;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.3rem;
+    color: var(--cream);
+    line-height: 1.6;
+  }
+ 
+  /* Divider */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 48px 0;
+    opacity: 0.3;
+  }
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--amber);
+  }
+  .divider span { color: var(--amber); font-size: 10px; }
+ 
+  /* Warm glow background sections */
+  .section-warm {
+    background: radial-gradient(ellipse at 30% 50%, rgba(200,129,58,0.06) 0%, transparent 70%);
+  }
+ 
+  /* ── HIDDEN MESSAGE SECTION ── */
+  #reveal-section {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 100px 0;
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.9s ease, transform 0.9s ease;
+  }
+ 
+  #reveal-section.visible { opacity: 1; transform: translateY(0); }
+ 
+  .reveal-intro {
+    font-size: 0.7rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 32px;
+  }
+ 
+  .reveal-prompt {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.6rem, 5vw, 2.4rem);
+    font-style: italic;
+    color: var(--cream);
+    margin-bottom: 16px;
+    line-height: 1.3;
+  }
+ 
+  .reveal-sub {
+    font-size: 0.9rem;
+    color: #a07050;
+    font-weight: 300;
+    margin-bottom: 48px;
+  }
+ 
+  /* The sentences with glowable first letters */
+  .sentences {
+    margin-bottom: 48px;
+  }
+ 
+  .sentence {
+    font-family: 'Lora', serif;
+    font-size: 1rem;
+    line-height: 2;
+    color: #b08060;
+    font-weight: 300;
+    transition: color 0.4s ease;
+  }
+ 
+  .first-letter {
+    display: inline-block;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    font-weight: 500;
+    color: #7a5030;
+    transition: all 0.5s ease;
+    position: relative;
+  }
+ 
+  .first-letter.glowing {
+    color: var(--glow);
+    text-shadow:
+      0 0 8px rgba(255,204,102,0.9),
+      0 0 20px rgba(255,180,60,0.6),
+      0 0 40px rgba(255,150,30,0.3);
+    transform: scale(1.15);
+  }
+ 
+  .sentence.lit { color: #d4b08a; }
+ 
+  /* Reveal button */
+  .reveal-btn {
+    display: inline-block;
+    padding: 16px 48px;
+    background: linear-gradient(135deg, var(--rust), var(--amber));
+    border: none;
+    color: var(--cream);
+    font-family: 'Lora', serif;
+    font-size: 0.8rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 32px rgba(200,129,58,0.3);
+  }
+ 
+  .reveal-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(200,129,58,0.45);
+  }
+ 
+  .reveal-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+ 
+  /* ── FINAL MESSAGE ── */
+  #final-section {
+    min-height: 60vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 80px 0 120px;
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 1.2s ease 0.3s, transform 1.2s ease 0.3s;
+    text-align: center;
+  }
+ 
+  #final-section.visible { opacity: 1; transform: translateY(0); }
+ 
+  .final-big {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.4rem, 9vw, 5rem);
+    font-style: italic;
+    line-height: 1.15;
+    color: var(--cream);
+    margin-bottom: 24px;
+    animation: none;
+  }
+ 
+  .final-big span { color: var(--amber-light); }
+ 
+  .final-small {
+    font-size: 0.95rem;
+    color: #a07050;
+    font-weight: 300;
+    line-height: 1.8;
+    max-width: 420px;
+    margin: 0 auto;
+  }
+ 
+  /* Floating particles */
+  .particles {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+  }
+ 
+  .particle {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: var(--amber);
+    border-radius: 50%;
+    opacity: 0;
+    animation: float linear infinite;
+  }
+ 
+  @keyframes float {
+    0%   { transform: translateY(100vh) scale(0); opacity: 0; }
+    10%  { opacity: 0.6; }
+    90%  { opacity: 0.2; }
+    100% { transform: translateY(-20px) scale(1); opacity: 0; }
+  }
+ 
+  /* Scroll indicator */
+  .scroll-hint {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    opacity: 1;
+    transition: opacity 0.5s;
+    z-index: 10;
+  }
+ 
+  .scroll-hint.hidden { opacity: 0; }
+ 
+  .scroll-line {
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, var(--amber), transparent);
+    animation: scrollPulse 1.5s ease infinite;
+  }
+ 
+  .scroll-text {
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--amber);
+    opacity: 0.6;
+  }
+ 
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 0.4; transform: scaleY(1); }
+    50%       { opacity: 1;   transform: scaleY(1.1); }
+  }
+ 
+  /* Music indicator */
+  .music-bar {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 50;
+    opacity: 0;
+    transition: opacity 0.5s;
+  }
+ 
+  .music-bar.visible { opacity: 1; }
+ 
+  .music-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--amber);
+    opacity: 0.7;
+  }
+ 
+  .bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 14px;
+  }
+ 
+  .bar {
+    width: 2px;
+    background: var(--amber);
+    border-radius: 1px;
+    animation: barDance 0.8s ease infinite;
+  }
+ 
+  .bar:nth-child(1) { animation-delay: 0s;    height: 6px; }
+  .bar:nth-child(2) { animation-delay: 0.15s; height: 10px; }
+  .bar:nth-child(3) { animation-delay: 0.3s;  height: 14px; }
+  .bar:nth-child(4) { animation-delay: 0.45s; height: 8px; }
+  .bar:nth-child(5) { animation-delay: 0.6s;  height: 12px; }
+ 
+  @keyframes barDance {
+    0%, 100% { transform: scaleY(0.4); }
+    50%       { transform: scaleY(1); }
+  }
+</style>
+</head>
+<body>
+ 
+<!-- Floating particles -->
+<div class="particles" id="particles"></div>
+ 
+<!-- Music indicator -->
+<div class="music-bar" id="musicBar">
+  <span class="music-label">This December</span>
+  <div class="bars">
+    <div class="bar"></div>
+    <div class="bar"></div>
+    <div class="bar"></div>
+    <div class="bar"></div>
+    <div class="bar"></div>
+  </div>
+</div>
+ 
+<!-- Scroll hint -->
+<div class="scroll-hint" id="scrollHint">
+  <span class="scroll-text">scroll</span>
+  <div class="scroll-line"></div>
+</div>
+ 
+<!-- INTRO SCREEN -->
+<div id="intro">
+  <div class="intro-label">a letter, just for you</div>
+  <div class="intro-name">For <span>Chastine</span></div>
+  <div class="intro-sub">there's something I've been wanting to say</div>
+  <button class="start-btn" id="startBtn">Open ✦</button>
+</div>
+ 
+<!-- STORY -->
+<div class="story">
+ 
+  <!-- Section 1 -->
+  <div class="section section-warm" data-section="1">
+    <div class="chapter">one ✦ the beginning</div>
+    <div class="display">We ended up in the<br><em>same place.</em></div>
+    <p class="para">Same service. Same people around us. And somehow, out of all of it, you were the one I kept noticing.</p>
+    <p class="para">Not in a loud way. In that quiet way where someone just <em>stays with you</em> — even when you're not thinking about it.</p>
+  </div>
+ 
+  <div class="divider"><span>✦</span></div>
+ 
+  <!-- Section 2 -->
+  <div class="section" data-section="2">
+    <div class="chapter">two ✦ what I noticed</div>
+    <div class="display">It's the little things<br>about <em>you.</em></div>
+    <p class="para">The way you speak — there's something about it I can't quite explain. It's just… you. And it gets me every time.</p>
+    <div class="pull">"Your attitude. The way you carry yourself. It's rare, Chastine. And I mean that."</div>
+    <p class="para">I wasn't looking for this. But I couldn't ignore it either.</p>
+  </div>
+ 
+  <div class="divider"><span>✦</span></div>
+ 
+  <!-- Section 3 -->
+  <div class="section section-warm" data-section="3">
+    <div class="chapter">three ✦ carniosa</div>
+    <div class="display">That moment<br>I held your <em>hand.</em></div>
+    <p class="para">I don't think I'll forget that for a long time. Something about it felt simple and significant at the same time.</p>
+    <p class="para">I went home that day with this feeling I couldn't shake. <em>A good feeling.</em> The kind that tells you something.</p>
+  </div>
+ 
+  <div class="divider"><span>✦</span></div>
+ 
+  <!-- Section 4 -->
+  <div class="section" data-section="4">
+    <div class="chapter">four ✦ the truth</div>
+    <div class="display">So here it is.<br><em>Honestly.</em></div>
+    <p class="para">I like you. Not just how you look — though that's not nothing — but who you actually are.</p>
+    <p class="para">I made this because I wanted you to know. No pressure, no expectations.</p>
+    <p class="para">Just the truth, from me to you.</p>
+    <p class="para">And maybe… there's one more thing hiding in here. 👇</p>
+  </div>
+ 
+  <div class="divider"><span>✦</span></div>
+ 
+  <!-- REVEAL SECTION -->
+  <div id="reveal-section">
+    <div class="reveal-intro">✦ a hidden message</div>
+    <div class="reveal-prompt">Look a little closer,<br><em>Chastine.</em></div>
+    <div class="reveal-sub">Press the button — and watch the first letter of each sentence.</div>
+ 
+    <div class="sentences" id="sentences">
+      <!-- W --> <div class="sentence" id="s0"><span class="first-letter" id="fl0">W</span>aking up and thinking of someone before the day even starts — that's how it's been for me.</div>
+      <!-- I --> <div class="sentence" id="s1"><span class="first-letter" id="fl1">I</span> know we're still getting to know each other, and I think that's what makes this exciting.</div>
+      <!-- L --> <div class="sentence" id="s2"><span class="first-letter" id="fl2">L</span>ittle things remind me of you more than they probably should.</div>
+      <!-- L --> <div class="sentence" id="s3"><span class="first-letter" id="fl3">L</span>aughter sounds different around you — lighter, somehow.</div>
+      <!-- Y --> <div class="sentence" id="s4"><span class="first-letter" id="fl4">Y</span>ou have this way of making a moment feel like it matters.</div>
+      <!-- O --> <div class="sentence" id="s5"><span class="first-letter" id="fl5">O</span>nly you would make me write something like this.</div>
+      <!-- U --> <div class="sentence" id="s6"><span class="first-letter" id="fl6">U</span>nderneath all the overthinking, the answer was always simple — I just like you.</div>
+      <!-- B --> <div class="sentence" id="s7"><span class="first-letter" id="fl7">B</span>eing honest with you felt scary, but it also felt right.</div>
+      <!-- E --> <div class="sentence" id="s8"><span class="first-letter" id="fl8">E</span>very moment I've spent with you, I've left smiling.</div>
+      <!-- M --> <div class="sentence" id="s9"><span class="first-letter" id="fl9">M</span>aybe you've noticed. Maybe you haven't. Either way — now you know.</div>
+      <!-- Y --> <div class="sentence" id="s10"><span class="first-letter" id="fl10">Y</span>ou deserve to know how someone really feels about you.</div>
+      <!-- G --> <div class="sentence" id="s11"><span class="first-letter" id="fl11">G</span>etting to this part of the letter took courage, I won't lie.</div>
+      <!-- I --> <div class="sentence" id="s12"><span class="first-letter" id="fl12">I</span>t's okay if you need time — I just needed you to hear this.</div>
+      <!-- R --> <div class="sentence" id="s13"><span class="first-letter" id="fl13">R</span>egardless of what happens next, I'm glad you read this.</div>
+      <!-- L --> <div class="sentence" id="s14"><span class="first-letter" id="fl14">L</span>ife's too short to keep things like this to yourself.</div>
+      <!-- F --> <div class="sentence" id="s15"><span class="first-letter" id="fl15">F</span>or what it's worth — you really are something special.</div>
+      <!-- R --> <div class="sentence" id="s16"><span class="first-letter" id="fl16">R</span>eally, truly.</div>
+      <!-- I --> <div class="sentence" id="s17"><span class="first-letter" id="fl17">I</span> mean every word of this.</div>
+      <!-- E --> <div class="sentence" id="s18"><span class="first-letter" id="fl18">E</span>ven the parts that scared me to write.</div>
+      <!-- N --> <div class="sentence" id="s19"><span class="first-letter" id="fl19">N</span>ow you know exactly how I feel.</div>
+      <!-- D --> <div class="sentence" id="s20"><span class="first-letter" id="fl20">D</span>on't forget it. 🧡</div>
+    </div>
+ 
+    <button class="reveal-btn" id="revealBtn">reveal the message ✦</button>
+  </div>
+ 
+  <!-- FINAL -->
+  <div id="final-section">
+    <div class="final-big">Will you be<br>my <span>girlfriend?</span></div>
+    <div class="final-small">No pressure. Just someone who genuinely likes you, asking honestly. 🧡</div>
+  </div>
+ 
+</div><!-- end .story -->
+ 
+<!-- Audio (YouTube embed fallback via iframe hidden, we use a note) -->
+<audio id="bgMusic" loop>
+  <source src="" type="audio/mpeg">
+</audio>
+ 
+<script>
+  // ── Particles ──
+  const pCont = document.getElementById('particles');
+  for (let i = 0; i < 25; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = Math.random() * 100 + 'vw';
+    p.style.width = (1 + Math.random() * 2) + 'px';
+    p.style.height = p.style.width;
+    p.style.animationDuration = (8 + Math.random() * 14) + 's';
+    p.style.animationDelay = (Math.random() * 12) + 's';
+    p.style.opacity = '0';
+    pCont.appendChild(p);
+  }
+ 
+  // ── Start button ──
+  const intro = document.getElementById('intro');
+  const musicBar = document.getElementById('musicBar');
+  const scrollHint = document.getElementById('scrollHint');
+ 
+  document.getElementById('startBtn').addEventListener('click', () => {
+    intro.classList.add('hidden');
+    musicBar.classList.add('visible');
+ 
+    // Try to play audio if user provided a file
+    const audio = document.getElementById('bgMusic');
+    audio.volume = 0.35;
+    audio.play().catch(() => {});
+  });
+ 
+  // ── Scroll observer ──
+  let scrolled = false;
+  window.addEventListener('scroll', () => {
+    if (!scrolled && window.scrollY > 80) {
+      scrolled = true;
+      scrollHint.classList.add('hidden');
+    }
+  });
+ 
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.15 });
+ 
+  document.querySelectorAll('.section, #reveal-section, #final-section').forEach(el => {
+    observer.observe(el);
+  });
+ 
+  // ── Reveal animation ──
+  const revealBtn = document.getElementById('revealBtn');
+  const totalLetters = 21;
+  let revealed = false;
+ 
+  revealBtn.addEventListener('click', () => {
+    if (revealed) return;
+    revealed = true;
+    revealBtn.disabled = true;
+    revealBtn.textContent = 'watch closely... ✦';
+ 
+    for (let i = 0; i < totalLetters; i++) {
+      setTimeout(() => {
+        const fl = document.getElementById('fl' + i);
+        const s  = document.getElementById('s'  + i);
+        if (fl) fl.classList.add('glowing');
+        if (s)  s.classList.add('lit');
+ 
+        // After all letters glow, show final section
+        if (i === totalLetters - 1) {
+          setTimeout(() => {
+            document.getElementById('final-section').classList.add('visible');
+            document.getElementById('final-section').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            revealBtn.textContent = '🧡';
+          }, 1000);
+        }
+      }, i * 280);
+    }
+  });
+</script>
+ 
+<!-- 
+  🎵 HOW TO ADD "This December" by Rex Orange County:
+  
+  1. Download the MP3 of the song
+  2. Place it in the same folder as this HTML file
+  3. Change the <source src=""> line above to:
+     <source src="this-december.mp3" type="audio/mpeg">
+  4. Done! It will play automatically when she presses Open.
+-->
+</body>
+</html>

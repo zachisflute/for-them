@@ -537,7 +537,7 @@
   <div class="section" data-section="4">
     <div class="chapter">four ✦ the truth</div>
     <div class="display">So here it is.<br><em>Honestly.</em></div>
-    <p class="para">I like you. Not just how you look — though that's not nothing — but who you actually are.</p>
+    <p class="para">I like you. Not just how you look, of course that's important, but more because of who you actually are.</p>
     <p class="para">I made this because I wanted you to know. No pressure, no expectations.</p>
     <p class="para">Just the truth, from me to you.</p>
     <p class="para">And maybe… there's one more thing hiding in here. 👇</p>
@@ -617,7 +617,7 @@
 
     // Try to play audio if user provided a file
     const audio = document.getElementById('bgMusic');
-    audio.volume = 1;
+    audio.volume = 0.35;
     audio.currentTime = 0;
     const playPromise = audio.play();
     if (playPromise !== undefined) {
@@ -636,10 +636,25 @@
     }
   });
 
+  let lastSectionTime = 0;
+  const SECTION_DELAY = 2000; // 2 seconds
+
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(e => {
-      if (e.isIntersecting) {
-        e.target.classList.add('visible');
+      if (e.isIntersecting && !e.target.classList.contains('visible')) {
+        const now = Date.now();
+        const timeSinceLastSection = now - lastSectionTime;
+        
+        if (timeSinceLastSection >= SECTION_DELAY) {
+          e.target.classList.add('visible');
+          lastSectionTime = now;
+        } else {
+          const delay = SECTION_DELAY - timeSinceLastSection;
+          setTimeout(() => {
+            e.target.classList.add('visible');
+            lastSectionTime = Date.now();
+          }, delay);
+        }
       }
     });
   }, { threshold: 0.15 });
@@ -681,15 +696,6 @@
     }
   });
 </script>
- 
-<!-- 
-  🎵 HOW TO ADD "This December" by Rex Orange County:
-  
-  1. Download the MP3 of the song
-  2. Place it in the same folder as this HTML file
-  3. Change the <source src=""> line above to:
-     <source src="this-december.mp3" type="audio/mpeg">
-  4. Done! It will play automatically when she presses Open.
--->
+
 </body>
 </html>

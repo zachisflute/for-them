@@ -657,7 +657,10 @@
       setTimeout(() => {
         const fl = document.getElementById('fl' + i);
         const s  = document.getElementById('s'  + i);
-        if (fl) fl.classList.add('glowing');
+        if (fl) {
+          fl.classList.add('glowing');
+          fl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
         if (s)  s.classList.add('lit');
  
         // After all letters glow, show final section

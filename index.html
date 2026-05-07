@@ -629,10 +629,32 @@
 
   // ── Scroll observer ──
   let scrolled = false;
+  let isScrollLocked = false;
+  
   window.addEventListener('scroll', () => {
     if (!scrolled && window.scrollY > 80) {
       scrolled = true;
       scrollHint.classList.add('hidden');
+    }
+
+    // Prevent scrolling past unloaded sections
+    if (isScrollLocked) {
+      const sections = document.querySelectorAll('.section, #reveal-section, #final-section');
+      let nextUnloadedSection = null;
+      
+      for (let section of sections) {
+        if (!section.classList.contains('visible')) {
+          nextUnloadedSection = section;
+          break;
+        }
+      }
+      
+      if (nextUnloadedSection) {
+        const rect = nextUnloadedSection.getBoundingClientRect();
+        if (rect.top < window.innerHeight) {
+          window.scrollTo(0, nextUnloadedSection.offsetTop - window.innerHeight + 100);
+        }
+      }
     }
   });
 
@@ -642,6 +664,7 @@
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(e => {
       if (e.isIntersecting && !e.target.classList.contains('visible')) {
+        isScrollLocked = true;
         const now = Date.now();
         const timeSinceLastSection = now - lastSectionTime;
         
@@ -653,8 +676,11 @@
           setTimeout(() => {
             e.target.classList.add('visible');
             lastSectionTime = Date.now();
+            isScrollLocked = false;
           }, delay);
+          return;
         }
+        isScrollLocked = false;
       }
     });
   }, { threshold: 0.15 });

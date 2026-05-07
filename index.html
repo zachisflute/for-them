@@ -617,14 +617,14 @@
  
     // Try to play audio if user provided a file
     const audio = document.getElementById('bgMusic');
-    audio.volume = 0.35;
-    audio.play().catch(() => {});
-  });
- 
-  // ── Scroll observer ──
-  let scrolled = false;
-  window.addEventListener('scroll', () => {
-    if (!scrolled && window.scrollY > 80) {
+    audio.volume = 1;
+    audio.currentTime = 0;
+    const playPromise = audio.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(error => {
+        console.log('Audio play error:', error);
+      });
+    }
       scrolled = true;
       scrollHint.classList.add('hidden');
     }
